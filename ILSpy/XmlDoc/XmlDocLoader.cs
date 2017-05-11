@@ -52,16 +52,20 @@ namespace ICSharpCode.ILSpy.XmlDoc
 			if (module == null)
 				throw new ArgumentNullException("module");
 			lock (cache) {
-				XmlDocumentationProvider xmlDoc;
-				if (!cache.TryGetValue(module, out xmlDoc)) {
-					string xmlDocFile = LookupLocalizedXmlDoc(module.FullyQualifiedName);
-					if (xmlDocFile == null) {
-						xmlDocFile = FindXmlDocumentation(Path.GetFileName(module.FullyQualifiedName), module.Runtime);
+				if (!cache.TryGetValue(module, out XmlDocumentationProvider xmlDoc))
+				{
+					string xmlDocFile = LookupLocalizedXmlDoc(module.FileName);
+					if (xmlDocFile == null)
+					{
+						xmlDocFile = FindXmlDocumentation(Path.GetFileName(module.FileName), module.Runtime);
 					}
-					if (xmlDocFile != null) {
+					if (xmlDocFile != null)
+					{
 						xmlDoc = new XmlDocumentationProvider(xmlDocFile);
 						cache.Add(module, xmlDoc);
-					} else {
+					}
+					else
+					{
 						xmlDoc = null;
 					}
 				}

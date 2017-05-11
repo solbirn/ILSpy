@@ -69,7 +69,7 @@ namespace ICSharpCode.ILSpy.VB
 			if (annotation == null)
 				return TypeKind.Unknown;
 			
-			var definition = annotation.ResolveOrThrow();
+			var definition = annotation.Resolve();
 			if (definition.IsClass)
 				return TypeKind.Class;
 			if (definition.IsInterface)
