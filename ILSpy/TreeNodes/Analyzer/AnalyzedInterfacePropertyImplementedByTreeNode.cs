@@ -32,10 +32,7 @@ namespace ICSharpCode.ILSpy.TreeNodes.Analyzer
 
 		public AnalyzedInterfacePropertyImplementedByTreeNode(PropertyDefinition analyzedProperty)
 		{
-			if (analyzedProperty == null)
-				throw new ArgumentNullException("analyzedProperty");
-
-			this.analyzedProperty = analyzedProperty;
+			this.analyzedProperty = analyzedProperty ?? throw new ArgumentNullException("analyzedProperty");
 			this.analyzedMethod = this.analyzedProperty.GetMethod ?? this.analyzedProperty.SetMethod;
 		}
 
@@ -64,8 +61,10 @@ namespace ICSharpCode.ILSpy.TreeNodes.Analyzer
 			foreach (PropertyDefinition property in type.Properties.Where(e => e.Name == analyzedProperty.Name)) {
 				MethodDefinition accessor = property.GetMethod ?? property.SetMethod;
 				if (TypesHierarchyHelpers.MatchInterfaceMethod(accessor, analyzedMethod, typeRef)) {
-					var node = new AnalyzedPropertyTreeNode(property);
-					node.Language = this.Language;
+					var node = new AnalyzedPropertyTreeNode(property)
+					{
+						Language = this.Language
+					};
 					yield return node;
 				}
 				yield break;
@@ -74,8 +73,10 @@ namespace ICSharpCode.ILSpy.TreeNodes.Analyzer
 			foreach (PropertyDefinition property in type.Properties.Where(e => e.Name.EndsWith(analyzedProperty.Name))) {
 				MethodDefinition accessor = property.GetMethod ?? property.SetMethod;
 				if (accessor.HasOverrides && accessor.Overrides.Any(m => m.Resolve() == analyzedMethod)) {
-					var node = new AnalyzedPropertyTreeNode(property);
-					node.Language = this.Language;
+					var node = new AnalyzedPropertyTreeNode(property)
+					{
+						Language = this.Language
+					};
 					yield return node;
 				}
 			}
