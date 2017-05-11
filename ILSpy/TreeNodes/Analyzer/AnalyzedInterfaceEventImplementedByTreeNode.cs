@@ -56,13 +56,16 @@ namespace ICSharpCode.ILSpy.TreeNodes.Analyzer
 		{
 			if (!type.HasInterfaces)
 				yield break;
-			TypeReference implementedInterfaceRef = type.Interfaces.FirstOrDefault(i => i.Resolve() == analyzedMethod.DeclaringType);
-			if (implementedInterfaceRef == null)
+			InterfaceImplementation implementedInterface = type.Interfaces.FirstOrDefault(i => i.InterfaceType.Resolve() == analyzedMethod.DeclaringType);
+			if (implementedInterface == null)
+				yield break;
+			TypeReference typeRef = implementedInterface.InterfaceType;
+			if (typeRef == null)
 				yield break;
 
 			foreach (EventDefinition ev in type.Events.Where(e => e.Name == analyzedEvent.Name)) {
 				MethodDefinition accessor = ev.AddMethod ?? ev.RemoveMethod;
-				if (TypesHierarchyHelpers.MatchInterfaceMethod(accessor, analyzedMethod, implementedInterfaceRef)) {
+				if (TypesHierarchyHelpers.MatchInterfaceMethod(accessor, analyzedMethod, typeRef)) {
 					var node = new AnalyzedEventTreeNode(ev);
 					node.Language = this.Language;
 					yield return node;

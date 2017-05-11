@@ -54,13 +54,16 @@ namespace ICSharpCode.ILSpy.TreeNodes.Analyzer
 		{
 			if (!type.HasInterfaces)
 				yield break;
-			TypeReference implementedInterfaceRef = type.Interfaces.FirstOrDefault(i => i.Resolve() == analyzedMethod.DeclaringType);
-			if (implementedInterfaceRef == null)
+			InterfaceImplementation implementedInterface = type.Interfaces.FirstOrDefault(i => i.InterfaceType.Resolve() == analyzedMethod.DeclaringType);
+			if (implementedInterface == null)
+				yield break;
+			TypeReference typeRef = implementedInterface.InterfaceType;
+			if (typeRef == null)
 				yield break;
 
 			foreach (PropertyDefinition property in type.Properties.Where(e => e.Name == analyzedProperty.Name)) {
 				MethodDefinition accessor = property.GetMethod ?? property.SetMethod;
-				if (TypesHierarchyHelpers.MatchInterfaceMethod(accessor, analyzedMethod, implementedInterfaceRef)) {
+				if (TypesHierarchyHelpers.MatchInterfaceMethod(accessor, analyzedMethod, typeRef)) {
 					var node = new AnalyzedPropertyTreeNode(property);
 					node.Language = this.Language;
 					yield return node;

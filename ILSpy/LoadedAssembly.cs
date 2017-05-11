@@ -142,13 +142,19 @@ namespace ICSharpCode.ILSpy
 			if (!module.HasDebugHeader) {
 				return;
 			}
-			byte[] headerBytes;
-			var debugHeader = module.GetDebugHeader(out headerBytes);
-			if (debugHeader.Type != 2) {
+			
+			var debugHeader = module.GetDebugHeader();
+
+			if (!debugHeader.HasEntries){
+				return;
+			}
+
+			if (debugHeader.Entries[0].Directory.Type != Mono.Cecil.Cil.ImageDebugType.CodeView)
+			{
 				// the debug type is not IMAGE_DEBUG_TYPE_CODEVIEW
 				return;
 			}
-			if (debugHeader.MajorVersion != 0 || debugHeader.MinorVersion != 0) {
+			if (debugHeader.Entries[0].Directory.MajorVersion != 0 || debugHeader.Entries[0].Directory.MinorVersion != 0) {
 				// the PDB type is not compatible with PdbReaderProvider. It is probably a Portable PDB
 				return;
 			}
@@ -220,6 +226,16 @@ namespace ICSharpCode.ILSpy
 			{
 				var node = parent.LookupReferencedAssembly(fullName);
 				return node != null ? node.AssemblyDefinition : null;
+			}
+
+			public void Dispose()
+			{
+				Dispose(true);
+				GC.SuppressFinalize(this);
+			}
+
+			private void Dispose(bool disposing)
+			{
 			}
 		}
 		
